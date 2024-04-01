@@ -13,6 +13,22 @@ const imageSchema = new mongoose.Schema({
 });
 const Image = mongoose.model("images", imageSchema);
 
+const taxSchema = new mongoose.Schema({
+  userId:String,
+  name: String,
+  waterTax:{
+    newBillNo: String,
+    oldBillNo: String,
+    amountDue: String,
+  },
+  propertyTax:{
+    newBillNo: String,
+    oldBillNo: String,
+    amountDue: String,
+  }
+});
+const TaxDetails = mongoose.model("taxes", taxSchema);
+
 app.use(cors());
 
 app.get("/getCertificates", async (req, res) => {
@@ -25,14 +41,30 @@ app.get("/getCertificates", async (req, res) => {
     }
   });
 
-app.get("/getCertificate/:date", async (req, res) => {
+app.get("/getCertificate", async (req, res) => {
   try {
-    const images = await Image.find({ date: req.params.date });
+    const date = req.query.date;
+    const images = await Image.find({ date });
+    res.status(200).json(images);
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");
   }
 });
+
+
+app.get("/getTaxDetails", async (req, res) => {
+  try {
+    const userId = req.query.userId;
+    const tax = await TaxDetails.find({ userId });
+    res.status(200).json(tax);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+
 
 app.post("/addCertificate", async (req, res) => {
   try {
